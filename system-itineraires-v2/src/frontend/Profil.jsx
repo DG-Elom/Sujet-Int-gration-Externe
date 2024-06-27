@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import "./style.css";
-import HeaderLogin from './components/HeaderLogin';
-import caller_auth from '../_services/caller_auth';
-import { toast } from 'react-toastify';
+import React from 'react';
+import { useState } from 'react';
+import Header from './components/Header';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import caller_auth from '../_services/caller_auth';
 
-export default function Connexion() {
+const Profil = () => {
     const [identifiant, setIdentifiant] = useState('');
     const [password, setPassword] = useState('');
 
@@ -19,8 +19,10 @@ export default function Connexion() {
             motdepasse: password
         };
 
+        const id = 4;
+
         try {
-            const res = await fetch(`${caller_auth.API_URL}/login`, {
+            const res = await fetch(`${caller_auth.API_URL}/update?id=${id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -29,11 +31,10 @@ export default function Connexion() {
             });
 
             const jsonRes = await res.json();
-            
+
             if (jsonRes.statut === 'Succès') {
                 toast.success('Connexion réussie !');
                 localStorage.setItem('token', jsonRes.token)
-                
                 navigate('/')
             } else {
                 toast.error('Votre identifiant n\'existe pas ou ne correspond pas avec le mot de passe, veuillez réessayer');
@@ -43,16 +44,15 @@ export default function Connexion() {
             toast.error('Erreur lors de la connexion avec le serveur, veuillez réessayer plus tard');
         }
     };
-
     return (
         <>
-            <HeaderLogin />
-            <h1 className='d-flex justify-content-center align-items-center full-height mt-4'>Connexion</h1>
+            <Header />
+            <h1 className='d-flex justify-content-center align-items-center full-height mt-4'>Modifier mon profil</h1>
             <div className="d-flex justify-content-center align-items-center full-height mt-4">
                 <div className="p-5 bg-light border">
                     <form onSubmit={handleSubmit}>
                         <div className="mb-3">
-                            <label>Identifiant :</label>
+                            <label>Nouvel Identifiant :</label>
                             <input 
                                 type="text" 
                                 className="form-control" 
@@ -62,7 +62,7 @@ export default function Connexion() {
                             />
                         </div>
                         <div className="mb-3">
-                            <label>Mot de passe :</label>
+                            <label>Nouveau Mot de passe :</label>
                             <input 
                                 type="password" 
                                 className="form-control" 
@@ -71,13 +71,14 @@ export default function Connexion() {
                                 required 
                             />
                         </div>
-                        <button type="submit" className="btn btn-primary">Se connecter</button>
+                        <button type="submit" className="btn btn-primary">Modifier</button>
                     </form>
                     <div className="mt-3">
-                        <p>Vous n'avez pas de compte ? <a href="/register">Inscrivez-vous</a></p>
                     </div>
                 </div>
             </div>
         </>
     );
-}
+};
+
+export default Profil;

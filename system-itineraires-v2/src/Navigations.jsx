@@ -6,6 +6,7 @@ import Maps from './frontend/Maps';
 import Stations from './frontend/Stations';
 import Historique from './frontend/Historique';
 import AuthGuard from './_helpers/AuthGuard';
+import Profil from './frontend/Profil';
 
 export default function Navigations(){
     return(
@@ -17,6 +18,7 @@ export default function Navigations(){
                     <AuthGuard>
                         <Routes>
                             <Route path="/" element={<Dashboard />} />
+                            <Route path="/profil" element={<Profil />} />
                             <Route path="/maps" element={<Maps />} />
                             <Route path="/stations" element={<Stations />} />
                             <Route path="/historique" element={<Historique />} />

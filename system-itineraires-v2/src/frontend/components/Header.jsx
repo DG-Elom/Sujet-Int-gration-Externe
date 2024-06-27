@@ -61,6 +61,7 @@ const Header = () => {
                                 Nom de l'utilisateur
                             </a>
                             <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                <li><a className="dropdown-item" href="/profil" >profil</a></li>
                                 <li><a className="dropdown-item" href="#" onClick={logout}>Se déconnecter</a></li>
                             </ul>
                         </li>
