@@ -11,11 +11,20 @@ require('dotenv').config();
 // Import du module "jsonwebtoken" pour gérer les token d'authentification et par conséquent les sessions utiilsateurs
 const jwt = require('jsonwebtoken');
 
+const cors = require('cors');
+
 // Crée un serveur web avec "express"
 const app = express();
 
 // Je récupère le JWT_SECRET dans mon fichier environnement. Il permet de signer les tokens afin que le serveur puisse les valider.
 const JWT_SECRET = process.env.JWT_SECRET;
+
+// Gestion des erreurs CORS
+app.use(cors({
+    origin: 'http://localhost:3000',
+    methods: 'GET, POST, PATCH',
+    allowedHeaders: 'Content-Type, Authorization'
+}))
 
 // Permet de lire et parser les données de formulaite HTML
 app.use(bodyParser.urlencoded({extended: true}))
