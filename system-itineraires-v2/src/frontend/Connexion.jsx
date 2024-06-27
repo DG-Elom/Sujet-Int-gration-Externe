@@ -31,9 +31,10 @@ export default function Connexion() {
 
             const jsonRes = await res.json();
             setResponse(jsonRes);
-
+            
             if (jsonRes.statut === 'Succès') {
                 toast.success('Connexion réussie !');
+                localStorage.setItem('token', jsonRes.token)
                 navigate('/')
             } else {
                 toast.error('Votre identifiant n\'existe pas ou ne correspond pas avec le mot de passe, veuillez réessayer');

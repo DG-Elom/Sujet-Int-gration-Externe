@@ -11,18 +11,18 @@ export default function Navigations(){
     return(
         <BrowserRouter>
             <Routes>
-                <Route path="/register" element={<Inscription />}></Route>
-                <Route path="/login" element={<Connexion />}></Route>
+                <Route path="/register" element={<Inscription />} />
+                <Route path="/login" element={<Connexion />} />
                 <Route path='/*' element={
                     <AuthGuard>
                         <Routes>
-                            <Route path="/" element={<Dashboard />}></Route>
+                            <Route path="/da" element={<Dashboard />} />
                             <Route path="/maps" element={<Maps />} />
                             <Route path="/stations" element={<Stations />} />
                             <Route path="/historique" element={<Historique />} />
                         </Routes>
                     </AuthGuard>
-          }/>
+                }/>
             </Routes>
         </BrowserRouter>
     );
