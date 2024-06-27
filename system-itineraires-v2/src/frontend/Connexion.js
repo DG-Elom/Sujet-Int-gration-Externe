@@ -15,7 +15,7 @@ export default function Connexion() {
         };
 
         try {
-            const res = await fetch('', {
+            const res = await fetch('http://localhost:2999/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -25,7 +25,7 @@ export default function Connexion() {
 
             const jsonRes = await res.json();
             setResponse(jsonRes);
-
+            console.log(jsonRes.statut);
             if (jsonRes.statut === 'Succès') {
                 alert('Connexion réussie !');
             } else {
@@ -43,7 +43,7 @@ export default function Connexion() {
                 <form onSubmit={handleSubmit}>
                     <div className="mb-3">
                         <label>Identifiants :</label>
-                        <input type="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                        <input type="TEXT" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} required />
                     </div>
                     <div className="mb-3">
                         <label>Mot de passe :</label>
