@@ -74,6 +74,42 @@ function validateToken(req, res, next) {
     next();
 }
 
+// On créé une fonction qui vérifie si l'utilisateur est connecté
+async function verifiedConnection(req, res, next) {
+    // Je récupère le token qui est envoyé
+    token = req.body.jeton;
+    
+    // On vérifie si le champs "jeton" est absent ou vide dans le corps de la requête
+    if(!token) {
+        return res.status(400).json({ statut: 'Erreur', message: "JSON incorrect"})
+    }
+
+    try {
+        // On récupère le username de l'utilisateur si son token est toujours valide et présent dans la base de données
+        const [results] = await req.db.execute(
+            // Je joint les deux tables "users" et "tokens" pour accéder aux données utilisateur;
+            `SELECT u.username 
+            FROM tokens t
+            JOIN users u ON t.user_id = u.id
+            WHERE t.token = ? AND t.expires_at > NOW();`,
+            [token] // Je passe le token en tant que paramètre de la requête afin d'éviter l'injection de code
+        );
+
+        // Vérification des résultats retournés par la requête.
+        if(results.length > 0) {
+            // On appel la fonction "next" si le champs requis est présent afin de passer à la suite du code.
+            next();
+        } else {
+            // Si aucun token a été trouvé alors je renvoie une erreur 401 : Unauthorized
+            res.status(401).json({ statut: "Erreur", message: "Jeton inconnu" });
+        }
+
+    } catch (error) {
+        // Voici ce que j'envoie si une autre erreur serveur se produit. Statut 500 pour spécifié que le serveur n'est pas disponible.
+        res.status(500).json({ statut: "Erreur", message: "Erreur du serveur, veuilleur réessayer ultérieurement" });
+    }
+}
+
 // function pour générer le token d'authentification
 function generateAccessToken(user) {
     return jwt.sign(user, JWT_SECRET, { expiresIn: '3600s' });
@@ -214,12 +250,75 @@ app.get('/logout', validateToken, async (req, res) => {
     }
 })
 
-app.post('/verify', (req, res) => {
+app.post('/verify', validateToken, async (req, res) => {
+    // Je récupère le token qui est envoyé dans le corps de la requête
+    const token = req.body.jeton;
 
+    try {
+        // On récupère le username de l'utilisateur si son token est toujours valide et présent dans la base de données
+        const [results] = await req.db.execute(
+            // Je joint les deux tables "users" et "tokens" pour accéder aux données utilisateur;
+            `SELECT u.username 
+            FROM tokens t
+            JOIN users u ON t.user_id = u.id
+            WHERE t.token = ? AND t.expires_at > NOW();`,
+            [token] // Je passe le token en tant que paramètre de la requête afin d'éviter l'injection de code
+        );
+
+        // Vérification des résultats retournés par la requête.
+        if(results.length > 0) {
+            // Si le tableau "results" contient au moins un élément alors cela signifie que le token est valide.
+            res.status(200).json({
+                "statut": "Succès",
+                "message": "token validé !",
+                "utilisateur": {
+                    "identifiant": results[0].username
+                }
+            })
+        } else {
+            // Si aucun token a été trouvé alors je renvoie une erreur 401 : Unauthorized
+            res.status(401).json({ statut: "Erreur", message: "Jeton inconnu" });
+        }
+    } catch (error) {
+        // Voici ce que j'envoie si une erreur serveur se produit. Statut 500 pour spécifié que le serveur n'est pas disponible.
+        res.status(500).json({ statut: "Erreur", message: "Erreur du serveur, veuilleur réessayer ultérieurement" });
+    }
 })
 
-app.patch('/update?id={id}', (req, res) => {
-    
+app.patch('/update', verifiedConnection, async (req, res) => {
+    const userId = req.query.id;
+    const username = req.body.identifiant;
+    const newPassword = req.body.newPassword;
+
+    if(!userId) {
+        return res.status(400).json({})
+    }
+
+    if(!req.body || (!username && !newPassword)) {
+        return res.status(400).json({});
+    }
+
+    try {
+        if(username) {
+            await req.db.execute(
+                'UPDATE users SET username = ? WHERE id = ?', [username, userId]
+            );
+        }
+
+        if(newPassword) {
+            // Je hash le mot de passe à l'aide de "bcrypt". Le "10" signifie le nombre de fois que l'algorithme de hash est effectué. Plus le nombre est grand plus la sécurité est grande mais plus le temps d'exécution est long.
+            // C'est pourquoi on utilise await afin d'attendre la fin d'exécution de bcrypt qui peut être plus ou moins longue selon le nombre de fois que l'algorithme de hash est effectué.
+            const hashedpassword = await bcrypt.hash(password, 10);
+            await req.db.execute(
+                'UPDATE users SET password = ? WHERE id = ?', [hashedpassword, userId]
+            );
+        }
+
+        res.status(200).json({ statut: "Succès", message: `Les modifications ont bien été effectuées` });
+    } catch (error) {
+        // Voici ce que j'envoie si une erreur serveur se produit. Statut 500 pour spécifié que le serveur n'est pas disponible.
+        res.status(500).json({ statut: "Erreur", message: "Erreur du serveur, veuilleur réessayer ultérieurement" });
+    }
 })
 
 app.listen(2999, () => {
