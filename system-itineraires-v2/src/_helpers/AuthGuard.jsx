@@ -1,12 +1,12 @@
 import React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import caller_auth from '../_services/caller_auth';
 
 const AuthGuard = ( {children} ) => {
-    const [response, setResponse] = useState('');
     const navigate = useNavigate();
+    const toastDisplayed = useRef(false);
 
     useEffect(() => {
         const checkAuthentication = async() => {
@@ -15,7 +15,6 @@ const AuthGuard = ( {children} ) => {
             };
 
             try {
-              
                 const res = await fetch(`${caller_auth.API_URL}/verify`, {
                     method: 'POST',
                     headers: {
@@ -25,25 +24,30 @@ const AuthGuard = ( {children} ) => {
                 });
     
                 const jsonRes = await res.json();
-                setResponse(jsonRes);
     
                 if (jsonRes.statut === 'Succès') {
                     
                 } else {
+                    if(!toastDisplayed.current) {
+                        localStorage.removeItem('token');
+                        toast.error('Votre session a expiré, veuillez vous reconnecter.');
+                        navigate('/login');
+                        toastDisplayed.current = true;
+                    }
+                }
+            } catch (error) {
+                if(!toastDisplayed.current) {
                     localStorage.removeItem('token');
                     toast.error('Votre session a expiré, veuillez vous reconnecter.');
                     navigate('/login');
+                    toastDisplayed.current = true;
                 }
-            } catch (error) {
-                localStorage.removeItem('token');
-                toast.error('Votre session a expiré, veuillez vous reconnecter.');
-                navigate('/login');
             }
         }
 
         checkAuthentication();
 
-    }, [useNavigate])
+    }, [useNavigate, toastDisplayed])
 
     return children;
 };

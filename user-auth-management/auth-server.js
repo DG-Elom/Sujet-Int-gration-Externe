@@ -239,9 +239,13 @@ app.post('/login', validateRegisterAndLogin, async (req, res) => {
     }
 })
 
-app.get('/logout', validateToken, async (req, res) => {
-    // Je récupère le token qui est envoyé dans le corps de la requête
-    const token = req.body.jeton;
+app.get('/logout', async (req, res) => {
+    // Je récupère le token qui est envoyé dans l'en-tête Authorization
+    const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
+
+    if (!token) {
+        return res.status(400).json({ statut: 'Erreur', message: "JSON incorrect"})
+    }
 
     try {
         // Supprimer le token dans la base de données

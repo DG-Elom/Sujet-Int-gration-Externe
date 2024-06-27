@@ -16,7 +16,7 @@ export default function Navigations(){
                 <Route path='/*' element={
                     <AuthGuard>
                         <Routes>
-                            <Route path="/da" element={<Dashboard />} />
+                            <Route path="/" element={<Dashboard />} />
                             <Route path="/maps" element={<Maps />} />
                             <Route path="/stations" element={<Stations />} />
                             <Route path="/historique" element={<Historique />} />
