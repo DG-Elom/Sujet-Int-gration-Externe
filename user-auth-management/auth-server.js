@@ -21,7 +21,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 // Gestion des erreurs CORS
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: process.env.URL_CORS,
     methods: 'GET, POST, PATCH',
     allowedHeaders: 'Content-Type, Authorization'
 }))
