@@ -129,7 +129,7 @@ fetch(
                                 summary.totalDistance / 1000
                             } km<br/>Durée: ${
                                 summary.totalTime / 60
-                            } min<br/><br/>Instructions:<br/>`;
+                            } min<br/><br/><b>Instructions:</b><br/>`;
                             instructions.forEach((instruction, index) => {
                                 itineraryInfo.innerHTML += `${index + 1}. ${
                                     instruction.text
