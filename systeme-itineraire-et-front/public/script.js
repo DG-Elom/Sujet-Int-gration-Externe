@@ -157,6 +157,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const addItineraryButton = document.getElementById("addItinerary");
 
     addItineraryButton.addEventListener("click", function () {
+        document.getElementById("loading-spinner").classList.remove("hidden");
         const waypoints = [
             {
                 lat: selectedMarkers[0].getLatLng().lat,
@@ -196,6 +197,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 itinerary_name.remove();
                 // alert("Itinéraire ajouté avec succès");
                 location.reload();
+                document
+                    .getElementById("loading-spinner")
+                    .classList.add("hidden");
             }
         });
     });
@@ -208,6 +212,9 @@ document.addEventListener("DOMContentLoaded", function () {
             const itineraryId = this.id.split("_")[1];
 
             button.disabled = true;
+            document
+                .getElementById("loading-spinner")
+                .classList.remove("hidden");
 
             fetch(`http://localhost:3001/itinerary/${itineraryId}`)
                 .then((response) => response.blob())
@@ -230,12 +237,18 @@ document.addEventListener("DOMContentLoaded", function () {
                     a.click();
                     alert("PDF généré avec succès");
                     button.disabled = false;
+                    document
+                        .getElementById("loading-spinner")
+                        .classList.add("hidden");
                 });
         });
     });
 
     deleteButtons.forEach((button) => {
         button.addEventListener("click", function () {
+            document
+                .getElementById("loading-spinner")
+                .classList.remove("hidden");
             const itineraryId = this.id.split("_")[1];
 
             button.disabled = true;
@@ -252,6 +265,9 @@ document.addEventListener("DOMContentLoaded", function () {
                         button.disabled = false;
                         location.reload();
                     }
+                    document
+                        .getElementById("loading-spinner")
+                        .classList.add("hidden");
                 })
                 .catch((error) => {
                     console.error(
@@ -261,4 +277,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
         });
     });
+});
+// Afficher le spinner au début du chargement de la page
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("loading-spinner").classList.remove("hidden");
+});
+
+// Masquer le spinner lorsque la page est complètement chargée
+window.addEventListener("load", () => {
+    document.getElementById("loading-spinner").classList.add("hidden");
 });

@@ -3,6 +3,8 @@ const {
     verifyToken,
     getItineraries,
     setItineraries,
+    getStations,
+    shortenAddress,
 } = require("../utils/utils-functions");
 const uuidv4 = require("uuid").v4;
 
@@ -29,14 +31,19 @@ const getMainFunc = async (req, res) => {
             }
             const itinerariesWithNames = await Promise.all(
                 itineraries.map(async (itinerary) => {
-                    const startName = await getLieuName(
-                        itinerary.points[0].lat,
-                        itinerary.points[0].lng
+                    const p_liste = await Promise.all(
+                        itinerary.points.map(async (point) => {
+                            const name = await getLieuName(
+                                point.lat,
+                                point.lng
+                            );
+                            return shortenAddress(name);
+                        })
                     );
-                    const endName = await getLieuName(
-                        itinerary.points[1].lat,
-                        itinerary.points[1].lng
-                    );
+
+                    const startName = p_liste[0];
+                    const endName = p_liste[1];
+
                     return {
                         ...itinerary,
                         startName,

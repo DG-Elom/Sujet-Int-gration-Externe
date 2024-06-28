@@ -68,17 +68,28 @@ const setItineraries = async (req, itinerary) => {
     }
 };
 
+const shortenAddress = (address) => {
+    const parts = address.split(",");
+    const shortAddress = parts.slice(0, 3).join(", "); // Rue, quartier, arrondissement
+    return shortAddress;
+};
+
 const getItineraries = async (req, userId) => {
     try {
-        const [itineraries_exist] = await req.db.execute(
+        const [rows] = await req.db.execute(
             "SELECT * FROM `itineraries` WHERE userId = ?",
             [userId]
         );
 
-        if (itineraries_exist.length === 0) {
+        if (rows.length === 0) {
             return [];
         }
-        return itineraries_exist;
+        const itineraries = rows.map((row) => ({
+            ...row,
+            points: JSON.parse(row.points),
+        }));
+
+        return itineraries;
     } catch (error) {
         console.error("Erreur lors de la récupération des itinéraires:", error);
         return {
@@ -118,4 +129,5 @@ module.exports = {
     setItineraries,
     getStations,
     getItineraries,
+    shortenAddress,
 };

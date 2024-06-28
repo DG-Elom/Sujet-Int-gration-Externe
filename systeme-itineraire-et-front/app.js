@@ -10,6 +10,7 @@ const mysql = require("mysql2/promise");
 const {
     getMainFunc,
     postAddItineraryFunc,
+    deleteItineraryFunc,
     getVelibsFunc,
 } = require("./routes/pages-routes");
 const { db_configs } = require("./utils/db_configs");
@@ -48,6 +49,7 @@ app.get("/register", getRegisterFunc);
 app.post("/register", postRegisterFunc);
 app.get("/logout", getLogoutFunc);
 app.post("/add-itinerary", postAddItineraryFunc);
+app.delete("/delete-itinerary", deleteItineraryFunc);
 app.get("/velibs", getVelibsFunc);
 
 app.listen(port, () => {
