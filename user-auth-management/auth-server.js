@@ -171,12 +171,12 @@ app.post('/register', validateRegisterAndLogin, async (req, res) => {
                 hashedpassword
             ]
         );
-        
-        // J'appelle la fonction 'generateAccessToken' afin de créer un token d'authentification
-        const accessToken = generateAccessToken({ username : username });
 
         // Je récupère l'id de l'utilisateur qui vient d'être créé
         const userId = userResult.insertId;
+        
+        // J'appelle la fonction 'generateAccessToken' afin de créer un token d'authentification
+        const accessToken = generateAccessToken({ username : username, userId: userId });
 
         // J'appelle la fonction pour inscrire le token dans la base de données
         createToken(accessToken, userId, req.db);
@@ -222,11 +222,11 @@ app.post('/login', validateRegisterAndLogin, async (req, res) => {
             return res.status(401).json({ "statut": "Erreur", "message": "Identifiants incorrects" });
         }
 
-        // J'appelle la fonction 'generateAccessToken' afin de créer un token d'authentification
-        const accessToken = generateAccessToken({ username: username });
-
         // Je récupère l'id de l'utilisateur qui vient d'être créé
         const userId = username_exist[0].id;
+
+        // J'appelle la fonction 'generateAccessToken' afin de créer un token d'authentification
+        const accessToken = generateAccessToken({ username: username, userId: userId });
 
         // J'appelle la fonction pour inscrire le token dans la base de données
         createToken(accessToken, userId, req.db);
@@ -348,3 +348,7 @@ app.patch('/update', verifiedConnection, async (req, res) => {
 app.listen(2999, () => {
     console.log("On écoute sur le port 2999");
 })
+
+// Puisque j'enregistre les tokens utilisateurs dans la base de données  et afin de corriger le problème d'un grand nombre de ligne pour chaque token dans la table
+// jOn faire une tache cron à lancer régulièrement afin de supprimer les tokens expirés 
+// Voici un exemple du code à lancer : 
