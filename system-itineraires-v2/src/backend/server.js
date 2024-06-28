@@ -116,7 +116,7 @@ app.post('/login', async (req, res) => {
         const data = await response.json();
 
         if (data.statut === 'Succès') {
-            res.json({ statut: 'Succès', message: 'Utilisateur connecter', token: data.token });
+            res.json({ statut: 'Succès', message: 'Utilisateur connecté', token: data.token });
         } else {
             res.json({ statut: 'Erreur', message: data.message });
         }
