@@ -2,21 +2,32 @@ const express = require('express');
 const mysql = require('mysql');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const fetch = require('node-fetch');
+// Utilisation de l'importation dynamique pour node-fetch
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+// Chargement du fichier d'environnement
+require('dotenv').config({ path: '../../.env' });
 
 //on va initier ici l'applicaiton express
 const app = express();
-const port = 3001;
+const port = process.env.URL_ITINERAIRE;
 
 app.use(bodyParser.json());
-app.use(cors());
+app.use(cors({
+    // Je définit les origines autorisées à accéder aux ressources du serveur
+    origin: process.env.URL_CORS,
+    // J'autorise certaines méthodes
+    methods: 'GET, POST, PATCH',
+    // J'autorise certaines en-têtes
+    allowedHeaders: 'Content-Type, Authorization'
+}));
 
 //connexion à la base de données avec les logs
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'valib'
+    // Voir fichier .env qui contient les informations de connection
+    host: process.env.DATABASE_HOST,
+    user: process.env.DATABASE_USER,
+    password: process.env.DATABASE_PASS,
+    database: process.env.DATABASE_NAME,
 });
 
 // on va vérifier ici la connexion s'effectue bien à la base de données
@@ -25,7 +36,7 @@ connection.connect(err => {
         console.error('Erreur de connexion à la base de données:', err);
         return;
     }
-    console.log('COnnexion à la base de données succès!');
+    console.log('Connexion à la base de données succès!');
     createTables();
 });
 
@@ -38,11 +49,6 @@ function createTables() {
     
     connection.query(checkDirectionsTable, (err, result) => {
         if (err) {
-            console.error('erreur de verificatoin de table:', err);
-            return;
-        }
-        // si la table n'existe pas, elle sera créer 
-        if (result.length === 0) {
             const createDirectionsTable = `
                 CREATE TABLE directions (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -55,13 +61,13 @@ function createTables() {
             // ici on va exécuté la requete de création de la table et afficher des messages en fonctions de la status de création
             connection.query(createDirectionsTable, (err, result) => {
                 if (err) {
-                    console.error('erreur de creaton de table:', err);
+                    console.error('erreur de creaton de table : ', err);
                     return;
                 }
-                console.log('La table est créer avec succès!');
+                console.log('La table est créer avec succès !');
             });
         } else {
-            console.log('La table DIrections existe deja!');
+            console.log('La table Directions existe déjà !');
         }
     });
 }
@@ -136,13 +142,17 @@ app.post('/login', async (req, res) => {
 
 // ici c'est pour modifier les ifnormations de l'utilisateurs
 app.patch('/update', async (req, res) => {
-    const { id } = req.query;
     const { identifiant, newPassword, token } = req.body;
 
-    // on va passer par une vérification de token pour confirmé l'identité
-    if (!await verifyToken(token)) {
+    // On va passer par une vérification de token pour confirmer l'identité
+    const decodedToken = await verifyToken(token);
+    if (!decodedToken) {
         return res.status(401).json({ statut: 'Erreur', message: 'Jeton invalide' });
     }
+
+    // Récupérer le userId à partir du token
+    const id = decodedToken.userId;
+
     // puis une vérification des paramètres de la requetes
     if (!id || (!identifiant && !newPassword)) {
         return res.status(400).json({ statut: 'Erreur', message: 'JSON incorrect' });

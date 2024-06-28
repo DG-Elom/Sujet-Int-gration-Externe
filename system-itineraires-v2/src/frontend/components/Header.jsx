@@ -2,9 +2,25 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import caller_auth from '../../_services/caller_auth';
+import { jwtDecode } from 'jwt-decode';
+import { useState, useEffect } from 'react';
 
 const Header = () => {
+    const [username, setUsername] = useState('Profil');
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const decodedToken = jwtDecode(token);
+                // On définit le nom d'utilisateur à partir du token décodé
+                setUsername(decodedToken.username); 
+            } catch (error) {
+                console.error('Erreur lors du décodage du token:', error);
+            }
+        }
+    }, []);
 
     const logout = async (event) => {
         event.preventDefault();
@@ -58,10 +74,10 @@ const Header = () => {
                     <ul className="navbar-nav">
                         <li className="nav-item dropdown">
                             <a className="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Nom de l'utilisateur
+                                {username}
                             </a>
                             <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                <li><a className="dropdown-item" href="/profil" >profil</a></li>
+                                <li><a className="dropdown-item" href="/profil" >Modifier le profil</a></li>
                                 <li><a className="dropdown-item" href="#" onClick={logout}>Se déconnecter</a></li>
                             </ul>
                         </li>

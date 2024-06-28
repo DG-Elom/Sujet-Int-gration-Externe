@@ -14,15 +14,16 @@ const Profil = () => {
     const handleSubmit = async (event) => {
         event.preventDefault();
 
+        const token = localStorage.getItem('token');
+
         const data = {
             identifiant: identifiant,
-            motdepasse: password
+            newPassword: password,
+            token: token
         };
 
-        const id = 4;
-
         try {
-            const res = await fetch(`${caller_auth.API_URL}/update?id=${id}`, {
+            const res = await fetch(`${caller_auth.API_URL}/update`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
