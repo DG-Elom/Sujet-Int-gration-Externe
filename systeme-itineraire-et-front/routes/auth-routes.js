@@ -121,7 +121,13 @@ const postUpdateProfileFunc = async (req, res) => {
                 .then((response) => response.json())
                 .then((dataRes) => {
                     if (dataRes.statut == "Succès") {
-                        res.redirect("/");                  
+                                        
+                        // res.render("updateUser", {
+                        //     user: data.utilisateur.identifiant,
+                        //     modification: "Les modifications ont été effectuées.",
+                        //     error: "",
+                        // });
+                        res.redirect("/");
                     } else if (dataRes.statut == "ErreurIdentifiant") {
                         res.render("updateUser", {
                             user: data.utilisateur.identifiant,
