@@ -6,7 +6,7 @@ import Inscription from "./frontend/Inscription";
 function App() {
   return (
     <div className="App">
-      <Connexion />
+      <Dashboard />
     </div>
   );
 }
