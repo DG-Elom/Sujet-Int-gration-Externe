@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Itinéraire Vélib</title>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.2.3/css/bootstrap.min.css"
+            integrity="sha512-SbiR/eusphKoMVVXysTKG/7VseWii+Y3FdHrt0EpKgpToZeemhqHeZeLWLhJutz/2ut2Vw1uQEj2MbRF+TVBUA=="
+            crossorigin="anonymous"
+            referrerpolicy="no-referrer"
+        />
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
+        />
+        <link
+            rel="stylesheet"
+            href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css"
+        />
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a href="/" class="navbar-brand"
+                    ><i class="fas fa-code me-2"></i>VelibMAP</a
+                >
+                <div id="my-nav" class="collapse navbar-collapse">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item active">
+                            <a href="/" class="nav-link"
+                                ><i class="fas fa-home me-1"></i>Home</a
+                            >
+                        </li>
+
+                        <li class="nav-item active">
+                            <a href="/velibs" class="nav-link"
+                                ><i class="fa-solid fa-person-biking"></i>Liste
+                                velibs</a
+                            >
+                        </li>
+
+                        <li class="nav-item active">
+                            <% if (user) { %>
+                            <a href="/logout" class="nav-link"
+                                ><i class="fas fa-sign-out-alt me-1"></i>Se
+                                déconnecter</a
+                            >
+                            <% } else { %>
+                            <a href="/login" class="nav-link"
+                                ><i
+                                    class="fa-sharp fa-solid fa-basket-shopping me-1"
+                                ></i
+                                >Se connecter</a
+                            >
+                            <% } %>
+                        </li>
+
+                        <% if (user) { %>
+                        <p class="navbar-text"><%= user %></p>
+                        <% } %>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </body>
+</html>
