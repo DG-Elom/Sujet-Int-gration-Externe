@@ -12,7 +12,7 @@ const AuthGuard = ( {children} ) => {
         const checkAuthentication = async() => {
             const data = {
                 // Je récupère le token présent dans le local storage de l'utilisateur
-                jeton: localStorage.getItem('token'),
+                token: localStorage.getItem('token'),
             };
 
             try {

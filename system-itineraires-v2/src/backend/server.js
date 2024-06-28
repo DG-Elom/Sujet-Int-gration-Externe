@@ -40,21 +40,22 @@ connection.connect(err => {
 });
 
 //fonctions pour vérifier si le token est valide ou pas
-async function verifyToken(token) {
-    try {
-        // on va faire une requete http post pour vérifié le token auprès du serveur auth
-        const response = await fetch(`${process.env.AUTH_SERVER}/verify`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ jeton: token })
-        });
-        const data = await response.json(); // récupération des donnéées en JSON
-        return data.statut === 'Succès'; // return true si le statut est succès
-    } catch (error) {
-        console.error('Erreur de token:', error);
-        return false; // retourne faux dans le cas contraie
-    }
-}
+app.post('/verify', async (req, res) => {
+    const { token } = req.body;
+        try {
+            // on va faire une requete http post pour vérifié le token auprès du serveur auth
+            const response = await fetch(`${process.env.AUTH_SERVER}/verify`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ jeton: token })
+            });
+            const data = await response.json(); // récupération des donnéées en JSON
+            return data.statut === 'Succès'; // return true si le statut est succès
+        } catch (error) {
+            console.error('Erreur de token:', error);
+            return false; // retourne faux dans le cas contraie
+        }
+});
 
 // on va taper sur l'url pour sauvegarder les directions dans la base de données
 app.post('/save-directions', async (req, res) => {

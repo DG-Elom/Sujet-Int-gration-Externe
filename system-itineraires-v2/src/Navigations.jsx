@@ -21,7 +21,6 @@ export default function Navigations(){
                             <Route path="/profil" element={<Profil />} />
                             <Route path="/maps" element={<Maps />} />
                             <Route path="/stations" element={<Stations />} />
-                            <Route path="/historique" element={<Historique />} />
                         </Routes>
                     </AuthGuard>
                 }/>

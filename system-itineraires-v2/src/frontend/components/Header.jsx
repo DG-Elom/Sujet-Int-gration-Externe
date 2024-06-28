@@ -61,9 +61,9 @@ const Header = () => {
                 </button>
                 <div className="collapse navbar-collapse" id="navbarNav">
                     <ul className="navbar-nav mx-auto">
-                        <li className="nav-item mx-3">
+                        {/* <li className="nav-item mx-3">
                             <a className="nav-link" href="/historique">Liste des itinéraires enregistrer</a>
-                        </li>
+                        </li> */}
                         <li className="nav-item mx-3">
                             <a className="nav-link" href="/maps">Nouveau Itinéraire</a>
                         </li>
