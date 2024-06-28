@@ -1,0 +1,27 @@
+<%- include('layouts/header') %>
+<div class="container">
+    <h1 class="text-center mt-5">Liste des stations velibs</h1>
+    <div id="velibs-container" class="row">
+        <% if (stations && stations.length > 0) { %> <% stations.forEach(
+        (station) => { %>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"><%= station.name %></h5>
+                    <p class="card-text">
+                        <strong>Coodonnées :</strong><br> Latitude(<%= station.coordonnees_geo.lat
+                        %>) Longitude(<%= station.coordonnees_geo.lon %>)
+                    </p>
+                    <p class="card-text">
+                        <strong>Vélos disponible :</strong> <%= station.capacity
+                        %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <% }) %> <% } else { %>
+        <p>Aucune station de velib enregistré.</p>
+        <% } %>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,49 @@
+<%- include('layouts/header') %>
+<div class="container">
+    <h1 class="text-center mt-5">Liste des itinéraires</h1>
+    <div id="itineraries-container" class="row">
+        <% if (itineraries && itineraries.length > 0) { %> <%
+        itineraries.forEach((itinerary) => { %>
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"><%= itinerary.name %></h5>
+                    <p class="card-text">
+                        <strong>De :</strong> <%= itinerary.startName %> <br />
+                        <strong>A :</strong> <%= itinerary.endName %>
+                    </p>
+                    <div>
+                        <button
+                            id="generatePdfButton_<%= itinerary.itinerary%>"
+                            class="btn btn-primary"
+                        >
+                            Générer PDF
+                        </button>
+                        <button
+                            id="deleteItineraryButton_<%= itinerary.itinerary%>"
+                            class="btn btn-danger"
+                        >
+                            Supprimer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% }) %> <% } else { %>
+        <p>Aucun itinéraire enregistré.</p>
+        <% } %>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <h5 class="mt-5">Créer un nouvel itinéraire</h5>
+            <div id="itinerary-name" class="mb-2"></div>
+            <button id="addItinerary" class="btn btn-warning">
+                Ajouter un itinéraire
+            </button>
+        </div>
+        <div id="map" style="height: 450px" class="mt-3"></div>
+        <div id="itinerary-info"></div>
+    </div>
+</div>
+
+<%- include('layouts/footer') %>
