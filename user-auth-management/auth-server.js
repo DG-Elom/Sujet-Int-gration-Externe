@@ -345,8 +345,8 @@ app.patch('/update', verifiedConnection, async (req, res) => {
     }
 })
 
-app.listen(2999, () => {
-    console.log("On écoute sur le port 2999");
+app.listen(process.env.PORT_AUTH, () => {
+    console.log(`On écoute sur le port ${process.env.PORT_AUTH}`);
 })
 
 // Puisque j'enregistre les tokens utilisateurs dans la base de données  et afin de corriger le problème d'un grand nombre de ligne pour chaque token dans la table

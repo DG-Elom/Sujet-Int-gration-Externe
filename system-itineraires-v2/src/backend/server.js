@@ -37,46 +37,13 @@ connection.connect(err => {
         return;
     }
     console.log('Connexion à la base de données succès!');
-    createTables();
 });
-
-// on va venir créer la table 'directions" qui va contenir les informations de l'historique de sauvegarde d'itinéraires du user
-//on va aussi vérifier si la table existe déjà sinon la créer 
-function createTables() { 
-    const checkDirectionsTable = `
-        SELECT 1 FROM directions LIMIT 1;
-    `;
-    
-    connection.query(checkDirectionsTable, (err, result) => {
-        if (err) {
-            const createDirectionsTable = `
-                CREATE TABLE directions (
-                    id INT AUTO_INCREMENT PRIMARY KEY,
-                    station_name VARCHAR(255) NOT NULL,
-                    start_address VARCHAR(255) NOT NULL,
-                    directions_text TEXT NOT NULL,
-                    map_image TEXT
-                );
-            `;
-            // ici on va exécuté la requete de création de la table et afficher des messages en fonctions de la status de création
-            connection.query(createDirectionsTable, (err, result) => {
-                if (err) {
-                    console.error('erreur de creaton de table : ', err);
-                    return;
-                }
-                console.log('La table est créer avec succès !');
-            });
-        } else {
-            console.log('La table Directions existe déjà !');
-        }
-    });
-}
 
 //fonctions pour vérifier si le token est valide ou pas
 async function verifyToken(token) {
     try {
         // on va faire une requete http post pour vérifié le token auprès du serveur auth
-        const response = await fetch('http://localhost:2999/verify', {
+        const response = await fetch(`${process.env.AUTH_SERVER}/verify`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ jeton: token })
@@ -96,6 +63,25 @@ app.post('/save-directions', async (req, res) => {
     if (!await verifyToken(token)) {
         return res.status(401).json({ statut: 'Erreur', message: 'Jeton invalide' });
     }
+
+    // Je lance ce code la première fois afin d'ajouter la table directions
+    // const createDirectionsTable = `
+    //             CREATE TABLE directions (
+    //                 id INT AUTO_INCREMENT PRIMARY KEY,
+    //                 station_name VARCHAR(255) NOT NULL,
+    //                 start_address VARCHAR(255) NOT NULL,
+    //                 directions_text TEXT NOT NULL,
+    //                 map_image TEXT
+    //             );
+    //         `;
+    // // ici on va exécuté la requete de création de la table et afficher des messages en fonctions de la status de création
+    // connection.query(createDirectionsTable, (err, result) => {
+    //     if (err) {
+    //         console.error('erreur de creation de table : ', err);
+    //         return;
+    //     }
+    //     console.log('La table est créer avec succès !');
+    // });
 
     // requete mysql pour inserer les directions dans la table 
     const sql = `INSERT INTO directions (station_name, start_address, directions_text, map_image)
@@ -121,7 +107,7 @@ app.post('/login', async (req, res) => {
     }
 
     try {
-        const response = await fetch('http://localhost:2999/login', {
+        const response = await fetch(`${process.env.AUTH_SERVER}/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ identifiant, motdepasse })
@@ -159,7 +145,7 @@ app.patch('/update', async (req, res) => {
     }
 
     try {
-        const response = await fetch('http://localhost:2999/update', {
+        const response = await fetch(`${process.env.AUTH_SERVER}/update`, {
             method: 'PATCH',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id, identifiant, newPassword })
@@ -187,7 +173,7 @@ app.post('/logout', async (req, res) => {
     }
 
     try {
-        const response = await fetch('http://localhost:2999/logout', {
+        const response = await fetch(`${process.env.AUTH_SERVER}/logout`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ jeton: token })
@@ -215,7 +201,7 @@ app.post('/register', async (req, res) => {
     }
 
     try {
-        const response = await fetch('http://localhost:2999/register', {
+        const response = await fetch(`${process.env.AUTH_SERVER}/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ identifiant, motdepasse })
