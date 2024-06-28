@@ -194,7 +194,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 document.getElementById("addItinerary").disabled = true;
                 // supprimer le input
                 itinerary_name.remove();
-                alert("Itinéraire ajouté avec succès");
+                // alert("Itinéraire ajouté avec succès");
+                location.reload();
             }
         });
     });
@@ -249,7 +250,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 .then((response) => {
                     if (response.ok) {
                         button.disabled = false;
-                        alert("Itinéraire supprimé avec succès");
+                        location.reload();
                     }
                 })
                 .catch((error) => {
