@@ -208,7 +208,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             button.disabled = true;
 
-            fetch(`http://localhost:2999/itinerary/${itineraryId}`)
+            fetch(`http://localhost:3001/itinerary/${itineraryId}`)
                 .then((response) => response.blob())
                 .catch((error) => {
                     console.error(
