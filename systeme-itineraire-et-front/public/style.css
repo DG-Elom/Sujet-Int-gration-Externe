@@ -13,6 +13,7 @@
     height: 100%; /* Prendre toute la hauteur */
 
     background-color: rgba(0, 0, 255, 0.5); /* Fond bleu semi-transparent */
+    color: #fff; /* Texte blanc */
     z-index: 1000; /* Assurez-vous qu'il soit au-dessus des autres éléments */
 }
 

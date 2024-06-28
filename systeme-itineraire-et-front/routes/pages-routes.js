@@ -5,6 +5,7 @@ const {
     setItineraries,
     getStations,
     shortenAddress,
+    haversineDistance,
 } = require("../utils/utils-functions");
 const uuidv4 = require("uuid").v4;
 
@@ -29,6 +30,7 @@ const getMainFunc = async (req, res) => {
                     itineraries: [],
                 });
             }
+
             const itinerariesWithNames = await Promise.all(
                 itineraries.map(async (itinerary) => {
                     const p_liste = await Promise.all(
@@ -41,6 +43,11 @@ const getMainFunc = async (req, res) => {
                         })
                     );
 
+                    const distance = haversineDistance(
+                        itinerary.points[0],
+                        itinerary.points[1]
+                    );
+
                     const startName = p_liste[0];
                     const endName = p_liste[1];
 
@@ -48,6 +55,7 @@ const getMainFunc = async (req, res) => {
                         ...itinerary,
                         startName,
                         endName,
+                        distance,
                         token: req.cookies.usertoken,
                     };
                 })
