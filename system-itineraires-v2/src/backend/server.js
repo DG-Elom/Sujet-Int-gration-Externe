@@ -41,13 +41,13 @@ connection.connect(err => {
 
 //fonctions pour vérifier si le token est valide ou pas
 app.post('/verify', async (req, res) => {
-    const { token } = req.body;
+    const { jeton } = req.body.jeton;
         try {
             // on va faire une requete http post pour vérifié le token auprès du serveur auth
             const response = await fetch(`${process.env.AUTH_SERVER}/verify`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ jeton: token })
+                body: JSON.stringify({ jeton: jeton })
             });
             const data = await response.json(); // récupération des donnéées en JSON
             return data.statut === 'Succès'; // return true si le statut est succès
@@ -166,18 +166,20 @@ app.patch('/update', async (req, res) => {
 });
 
 // c'est pour la déconnexion de l'utilisateur
-app.post('/logout', async (req, res) => {
-    const { token } = req.body;
-    // à nouveau vérifier le token
+app.get('/logout', async (req, res) => {
+    const token = req.headers.authorization && req.headers.authorization.split(' ')[1];
+
     if (!token) {
-        return res.status(400).json({ statut: 'Erreur', message: 'JSON incorrect' });
+        return res.status(400).json({ statut: 'Erreur', message: "JSON incorrect"})
     }
 
     try {
         const response = await fetch(`${process.env.AUTH_SERVER}/logout`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ jeton: token })
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
         });
 
         const data = await response.json();

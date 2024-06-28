@@ -26,7 +26,7 @@ const Header = () => {
         event.preventDefault();
 
         const token = localStorage.getItem('token')
-        console.log(token);
+
         try {
             const res = await fetch(`${caller_auth.API_URL}/logout`, {
                 method: 'GET',

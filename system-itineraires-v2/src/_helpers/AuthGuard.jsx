@@ -12,10 +12,11 @@ const AuthGuard = ( {children} ) => {
         const checkAuthentication = async() => {
             const data = {
                 // Je récupère le token présent dans le local storage de l'utilisateur
-                token: localStorage.getItem('token'),
+                jeton: localStorage.getItem('token'),
             };
 
             try {
+                console.log(`${caller_auth.API_URL}/verify`);
                 const res = await fetch(`${caller_auth.API_URL}/verify`, {
                     method: 'POST',
                     headers: {
@@ -23,26 +24,22 @@ const AuthGuard = ( {children} ) => {
                     },
                     body: JSON.stringify(data),
                 });
-    
+                console.log('Réponse JSON:');
                 const jsonRes = await res.json();
-    
+                console.log('Réponse JSON:', jsonRes);
                 if (jsonRes.statut === 'Succès') {
-                    
+
                 } else {
-                    if(!toastDisplayed.current) {
-                        localStorage.removeItem('token');
-                        toast.error('Votre session a expiré, veuillez vous reconnecter.');
-                        navigate('/login');
-                        toastDisplayed.current = true;
-                    }
-                }
-            } catch (error) {
-                if(!toastDisplayed.current) {
                     localStorage.removeItem('token');
                     toast.error('Votre session a expiré, veuillez vous reconnecter.');
                     navigate('/login');
                     toastDisplayed.current = true;
                 }
+            } catch (error) {
+                localStorage.removeItem('token');
+                toast.error('Votre session a expiré, veuillez vous reconnecter.');
+                navigate('/login');
+                toastDisplayed.current = true;
             }
         }
 
