@@ -89,10 +89,66 @@ const postRegisterFunc = (req, res) => {
         });
 };
 
+const getUpdateProfileFunc = async (req, res) => {
+    if (req.cookies.usertoken) {
+        const { valid, data } = await verifyToken(req.cookies.usertoken);
+        if (valid) {
+
+            res.render("updateUser", {
+                user: data.utilisateur.identifiant,
+                modification: "",
+                error: ""
+            });
+        } else {
+            res.redirect("/");
+        }
+    }
+};
+
+const postUpdateProfileFunc = async (req, res) => {
+    if (req.cookies.usertoken) {
+        const { valid, data } = await verifyToken(req.cookies.usertoken);
+        if (valid) {
+            const { login, password } = req.body;
+
+            fetch(`${process.env.AUTH_SERVICE_URL}/update`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ identifiant: login, motdepasse: password, id: data.utilisateur.userId, jeton: req.cookies.usertoken }),
+            })
+                .then((response) => response.json())
+                .then((dataRes) => {
+                    if (dataRes.statut == "Succès") {
+                        res.redirect("/");                  
+                    } else if (dataRes.statut == "ErreurIdentifiant") {
+                        res.render("updateUser", {
+                            user: data.utilisateur.identifiant,
+                            modification: "",
+                            error: "Le changement n'a pas été effectué, le nom d'utilisateur existe déjà, veuillez réessayer",
+                        });
+                    } else {
+                        res.render("updateUser", {
+                            user: data.utilisateur.identifiant,
+                            modification: "",
+                            error: "Une erreur est survenue, veuillez réessayer.",
+                        });
+                        
+                    }
+                });
+        } else {
+            res.redirect("/");
+        }
+    }
+};
+
 module.exports = {
     getLoginFunc,
     postLoginFunc,
     getLogoutFunc,
     getRegisterFunc,
     postRegisterFunc,
+    getUpdateProfileFunc,
+    postUpdateProfileFunc,
 };

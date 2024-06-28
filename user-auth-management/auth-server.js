@@ -372,13 +372,13 @@ app.post("/verify", validateToken, async (req, res) => {
     }
 });
 
-app.patch("/update", verifiedConnection, async (req, res) => {
+app.post("/update", verifiedConnection, async (req, res) => {
     // Je récupère l'id de l'utilisateur dans la requête GET d'où le query
-    const userId = req.query.id;
+    const userId = req.body.id;
     // Je récupère l'identifiant dans le corps de la requête
     const username = req.body.identifiant;
     // Je récupère le password dans le corps de la requête
-    const newPassword = req.body.newPassword;
+    const newPassword = req.body.motdepasse;
 
     if (!userId) {
         // Voici ce que j'envoie si une erreur se produit. Statut 400 pour spécifié que l'identifiant de l'utilisateur n'a pas été trouvé'.
@@ -402,7 +402,7 @@ app.patch("/update", verifiedConnection, async (req, res) => {
         if (newPassword) {
             // Je hash le mot de passe à l'aide de "bcrypt". Le "10" signifie le nombre de fois que l'algorithme de hash est effectué. Plus le nombre est grand plus la sécurité est grande mais plus le temps d'exécution est long.
             // C'est pourquoi on utilise await afin d'attendre la fin d'exécution de bcrypt qui peut être plus ou moins longue selon le nombre de fois que l'algorithme de hash est effectué.
-            const hashedpassword = await bcrypt.hash(password, 10);
+            const hashedpassword = await bcrypt.hash(newPassword, 10);
             // Si l'utilisateur a envoyé un nouveau mot de passe alors je trouve l'utilisateur avec son id et je remplace son password avec le nouveau mot de passe haché
             await req.db.execute("UPDATE users SET password = ? WHERE id = ?", [
                 hashedpassword,
@@ -416,6 +416,14 @@ app.patch("/update", verifiedConnection, async (req, res) => {
             message: `Les modifications ont bien été effectuées`,
         });
     } catch (error) {
+        // Voici ce que j'envoie si une erreur de duplication intervient. Statut 409 pour spécifié un conflit que le client doit résoudre. Dans notre cas, un username déjà existant.
+        if (error.code === "ER_DUP_ENTRY") {
+            return res.status(409).json({
+                statut: "ErreurIdentifiant",
+                message: "Nom d'utilisateur déjà utilisé",
+            });
+        }
+
         // Voici ce que j'envoie si une erreur serveur se produit. Statut 500 pour spécifié que le serveur n'est pas disponible.
         res.status(500).json({
             statut: "Erreur",

@@ -1,6 +1,6 @@
 <%- include('layouts/header') %>
 <div class="container">
-    <h1 class="text-center mt-5">Liste des stations velibs</h1>
+    <h1 class="text-center mt-5 mb-5">Liste des stations velibs</h1>
     <div id="velibs-container" class="row">
         <% if (stations && stations.length > 0) { %> <% stations.forEach(
         (station) => { %>
@@ -25,3 +25,4 @@
     </div>
   </body>
 </html>
+<%- include('../layouts/auth-footer') %>

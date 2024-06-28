@@ -3,6 +3,7 @@ const {
     verifyToken,
     getItineraries,
     setItineraries,
+    getStations
 } = require("../utils/utils-functions");
 const uuidv4 = require("uuid").v4;
 
@@ -49,6 +50,7 @@ const getMainFunc = async (req, res) => {
             res.render("index", {
                 user: data.utilisateur.identifiant,
                 itineraries: itinerariesWithNames,
+                modification: ""
             });
         } else {
             res.redirect("/login");
