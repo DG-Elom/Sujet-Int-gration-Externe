@@ -10,7 +10,7 @@ const mysql = require("mysql2/promise");
 require("dotenv").config();
 // Import du module "jsonwebtoken" pour gérer les token d'authentification et par conséquent les sessions utiilsateurs
 const jwt = require("jsonwebtoken");
-
+// Import de CORS afin de contôoler les demandes depuis un autre domaine
 const cors = require("cors");
 
 // Crée un serveur web avec "express"
@@ -22,8 +22,11 @@ const JWT_SECRET = process.env.JWT_SECRET;
 // Gestion des erreurs CORS
 app.use(
     cors({
+        // Je définis les origines autorisées à accéder aux ressources du serveur
         origin: process.env.URL_CORS,
+        // J'autorise certaines méthodes
         methods: "GET, POST, PATCH",
+        // J'autorise certaines en-têtes
         allowedHeaders: "Content-Type, Authorization",
     })
 );
@@ -370,20 +373,26 @@ app.post("/verify", validateToken, async (req, res) => {
 });
 
 app.patch("/update", verifiedConnection, async (req, res) => {
+    // Je récupère l'id de l'utilisateur dans la requête GET d'où le query
     const userId = req.query.id;
+    // Je récupère l'identifiant dans le corps de la requête
     const username = req.body.identifiant;
+    // Je récupère le password dans le corps de la requête
     const newPassword = req.body.newPassword;
 
     if (!userId) {
+        // Voici ce que j'envoie si une erreur se produit. Statut 400 pour spécifié que l'identifiant de l'utilisateur n'a pas été trouvé'.
         return res.status(400).json({});
     }
 
     if (!req.body || (!username && !newPassword)) {
+        // Voici ce que j'envoie si une erreur se produit. Statut 400 pour spécifié que le nom et le mot de passe de l'utilisateur n'ont pas été trouvés.
         return res.status(400).json({});
     }
 
     try {
         if (username) {
+            // Si l'utilisateur a envoyé un nouveau nom alors je trouve l'utilisateur avec son id et je remplace son username
             await req.db.execute("UPDATE users SET username = ? WHERE id = ?", [
                 username,
                 userId,
@@ -394,12 +403,14 @@ app.patch("/update", verifiedConnection, async (req, res) => {
             // Je hash le mot de passe à l'aide de "bcrypt". Le "10" signifie le nombre de fois que l'algorithme de hash est effectué. Plus le nombre est grand plus la sécurité est grande mais plus le temps d'exécution est long.
             // C'est pourquoi on utilise await afin d'attendre la fin d'exécution de bcrypt qui peut être plus ou moins longue selon le nombre de fois que l'algorithme de hash est effectué.
             const hashedpassword = await bcrypt.hash(password, 10);
+            // Si l'utilisateur a envoyé un nouveau mot de passe alors je trouve l'utilisateur avec son id et je remplace son password avec le nouveau mot de passe haché
             await req.db.execute("UPDATE users SET password = ? WHERE id = ?", [
                 hashedpassword,
                 userId,
             ]);
         }
 
+        // Voici ce que j'envoie si les modifications ont bien été réalisé. Statut 200 pour spécifié que le serveur à réussi à modifier le ou les données de l'utilisateur.
         res.status(200).json({
             statut: "Succès",
             message: `Les modifications ont bien été effectuées`,
@@ -413,6 +424,6 @@ app.patch("/update", verifiedConnection, async (req, res) => {
     }
 });
 
-app.listen(2999, () => {
-    console.log("On écoute sur le port 2999");
+app.listen(process.env.PORT_AUTH, () => {
+    console.log(`On écoute sur le port ${process.env.PORT_AUTH}`);
 });

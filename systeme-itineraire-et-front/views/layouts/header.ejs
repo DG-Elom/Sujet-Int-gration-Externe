@@ -19,44 +19,66 @@
         />
     </head>
     <body>
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <nav class="navbar navbar-expand navbar-dark bg-dark">
             <div class="container">
                 <a href="/" class="navbar-brand"
                     ><i class="fas fa-code me-2"></i>VelibMAP</a
                 >
                 <div id="my-nav" class="collapse navbar-collapse">
                     <ul class="navbar-nav ms-auto">
-                        <li class="nav-item active">
-                            <a href="/" class="nav-link"
-                                ><i class="fas fa-home me-1"></i>Home</a
-                            >
-                        </li>
+                        <% if (user) { %>
+                            <li class="nav-item active">
+                                <a href="/" class="nav-link"
+                                    ><i class="fas fa-home me-1"></i>Accueil</a
+                                >
+                            </li>
 
+                            <li class="nav-item active">
+                                <a href="/velibs" class="nav-link"
+                                    ><i class="fa-solid fa-person-biking"></i>Liste
+                                    velibs</a
+                                >
+                            </li>
+                        <% } %>
                         <li class="nav-item active">
-                            <a href="/velibs" class="nav-link"
-                                ><i class="fa-solid fa-person-biking"></i>Liste
-                                velibs</a
-                            >
-                        </li>
-
-                        <li class="nav-item active">
-                            <% if (user) { %>
-                            <a href="/logout" class="nav-link"
-                                ><i class="fas fa-sign-out-alt me-1"></i>Se
-                                déconnecter</a
-                            >
-                            <% } else { %>
-                            <a href="/login" class="nav-link"
+                            <% if (!user) { %>
+                                <a href="/login" class="nav-link"
                                 ><i
                                     class="fa-sharp fa-solid fa-basket-shopping me-1"
                                 ></i
                                 >Se connecter</a
                             >
+
+                            <% } %>
+                        </li>
+
+                        <li class="nav-item active">
+                            <% if (!user) { %>
+                                <a href="/register" class="nav-link"
+                                ><i
+                                    class="fa-sharp fa-solid fa-basket-shopping me-1"
+                                ></i
+                                >S'inscrire</a
+                            >
+
                             <% } %>
                         </li>
 
                         <% if (user) { %>
-                        <p class="navbar-text"><%= user %></p>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <%= user %>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                        <li><a class="dropdown-item" href="/profile">Modifier mon Profil</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li>                            
+                                            <a href="/logout" class="dropdown-item nav-link text-black"
+                                            ><i class="fas fa-sign-out-alt me-1"></i>Se
+                                            déconnecter</a
+                                        ></li>
+                                </ul>
+                            </li>
                         <% } %>
                     </ul>
                 </div>
