@@ -120,8 +120,7 @@ const postUpdateProfileFunc = async (req, res) => {
             })
                 .then((response) => response.json())
                 .then((dataRes) => {
-                    if (dataRes.statut == "Succès") {
-                                        
+                    if (dataRes.statut == "Succès") {              
                         // res.render("updateUser", {
                         //     user: data.utilisateur.identifiant,
                         //     modification: "Les modifications ont été effectuées.",

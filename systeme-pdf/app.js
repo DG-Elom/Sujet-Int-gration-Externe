@@ -22,34 +22,39 @@ app.use(
 // Fonction de vérification du token (à implémenter)
 async function verifierToken(token) {
     try {
+        // J'appelle la route verify de mon serveur d'authentification
         const response = await fetch(`${process.env.AUTH_SERVICE_URL}/verify`, {
-            method: "POST",
+            method: "POST", // Méthode POST pour l'appel à l'api d'authentification
             headers: {
-                "Content-Type": "application/json",
+                "Content-Type": "application/json", // Type de contenu
             },
-            body: JSON.stringify({ jeton: token }),
+            body: JSON.stringify({ jeton: token }), // J'envoie le token de l'utiilisateur
         });
-        const data = await response.json();
+        const data = await response.json(); // Conversion de la réponse en JSON
 
-        return true;
+        return true; // Retourne true si la vérification est réussie
     } catch (e) {
-        return false;
+        return false; // Retourne false si une erreur survient
     }
 }
 
+// Fonction pour obtenir le nom d'un lieu à partir de ses coordonnées
 async function getLieuName(lat, lng) {
     const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`;
-    const response = await fetch(url);
-    const data = await response.json();
-    return data.display_name || "Lieu inconnu";
+    const response = await fetch(url); // Appel de l'api "nominatim.openstreettmap.org"
+    const data = await response.json(); // Conversion de la réponse en JSON
+    return data.display_name || "Lieu inconnu"; // Retourne le nom du lieu ou "Lieu inconnu" si aucun lieu est trouvé
 }
 
+// Route pour ajouter un itinéraire
 app.post("/itinerary", async (req, res) => {
     try {
+        // Je récupère les données du corps de la requête afin de les mettre dans des constantes
         const { itinerary, name, token, points } = req.body;
 
         // Vérification du jeton d'authentification
         if (!verifierToken(token)) {
+            // J'envoie une erreur 401 si l'authentification échoue
             return res
                 .status(401)
                 .json({ error: "Jeton d'authentification incorrect" });
@@ -57,7 +62,9 @@ app.post("/itinerary", async (req, res) => {
         console.log(points);
         console.log(itinerary);
 
+        // Je récupère le nom du lieu de départ
         const depart = await getLieuName(points[0].lat, points[0].lng);
+        // Je récupère le nom du lieu d'arrivée
         const arrivee = await getLieuName(points[1].lat, points[1].lng);
 
         // Génération de la carte Leaflet (côté serveur)
@@ -169,15 +176,15 @@ app.post("/itinerary", async (req, res) => {
         `;
 
         // Utilisation de Puppeteer pour capturer la carte
-        const browser = await puppeteer.launch();
-        const page = await browser.newPage();
-        await page.setContent(htmlContent);
-        const mapImage = await page.screenshot({ type: "png" });
-        await browser.close();
+        const browser = await puppeteer.launch(); // On ouvre un navigateur Puppeteer
+        const page = await browser.newPage(); // On ouvre une nouvelle page
+        await page.setContent(htmlContent); // On définit le contenu HTML de la nouvelle page
+        const mapImage = await page.screenshot({ type: "png" }); // On fait une capture d'écran de la carte
+        await browser.close(); // On ferme le navigateur
 
         // Création du PDF avec jsPDF
-        const pdf = new jsPDF();
-        pdf.addImage(mapImage, "PNG", 0, 0);
+        const pdf = new jsPDF(); // Création d'un nouveau document PDF
+        pdf.addImage(mapImage, "PNG", 0, 0); // Ajoute l'image de la carte au PDF
 
         // Enregistrement du PDF dans un fichier
         const pdfFilePath = path.join(
@@ -190,8 +197,8 @@ app.post("/itinerary", async (req, res) => {
         if (!fs.existsSync("pdfs.json")) {
             fs.writeFileSync("pdfs.json", "[]");
         }
-        const pdfs_data = fs.readFileSync("pdfs.json");
-        const pdfs = JSON.parse(pdfs_data);
+        const pdfs_data = fs.readFileSync("pdfs.json"); // On lit le fichier JSON
+        const pdfs = JSON.parse(pdfs_data); // Conversion des données en objet pour pouvoir le manipuler
         // vérifier si l'id de l'itinéraire existe déjà, si oui, le remplacer
         const pdfIndex = pdfs.findIndex((pdf) => pdf.id === itinerary);
         if (pdfIndex !== -1) {
@@ -199,20 +206,25 @@ app.post("/itinerary", async (req, res) => {
             fs.unlinkSync(pdfs[pdfIndex].pdfFilePath);
             pdfs[pdfIndex] = { pdfFilePath: pdfFilePath, id: itinerary };
         } else {
+            // Ajoute le nouveau fichier PDF
             pdfs.push({ pdfFilePath: pdfFilePath, id: itinerary });
         }
+        // On écrit les données dans le fichier json
         fs.writeFileSync("pdfs.json", JSON.stringify(pdfs));
 
+        // On enregistre le PDF dans le fichier
         pdf.save(pdfFilePath);
 
         res.status(204).end(); // Succès, pas de contenu retourné
     } catch (error) {
-        console.error(error);
+        console.error(error); // En cas d'erreur on affiche le message d'erreur
         res.status(500).json({ error: "Erreur lors de la génération du PDF" });
     }
 });
 
+// Route pour récupérer un itinéraire selon son id
 app.get("/itinerary/:id", (req, res) => {
+    // On récupère l'id de l'itinéraire dans les paramètres de la requête
     const id = req.params.id;
 
     const pdfFilePath = `./pdfs/itinerary-${id}.pdf`; // Chemin vers le fichier PDF
