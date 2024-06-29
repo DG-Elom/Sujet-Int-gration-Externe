@@ -139,7 +139,7 @@ const postUpdateProfileFunc = async (req, res) => {
 
             // On appel la route update sur le serveur d'authentification 
             fetch(`${process.env.AUTH_SERVICE_URL}/update`, {
-                method: "POST",
+                method: "PATCH", // On urilisa la méthode PATCH comme indiqué dans l'énoncé
                 headers: {
                     "Content-Type": "application/json",
                 },

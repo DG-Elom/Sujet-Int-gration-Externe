@@ -372,7 +372,7 @@ app.post("/verify", validateToken, async (req, res) => {
     }
 });
 
-app.post("/update", verifiedConnection, async (req, res) => {
+app.patch("/update", verifiedConnection, async (req, res) => {
     // Je récupère l'id de l'utilisateur dans la requête GET d'où le query
     const userId = req.body.id;
     // Je récupère l'identifiant dans le corps de la requête
