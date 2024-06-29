@@ -1,19 +1,30 @@
+// Import du module "express" afin de créer un serveur HTTP
 const express = require("express");
+// Import du module "fs" afin de travailler sur le système de fichier
 const fs = require("fs");
+// Import du module "path" afin de travailler avec les chemins des fichiers et répertoires
 const path = require("path");
+// Import de CORS afin de contôoler les demandes depuis un autre domaine
 const cors = require("cors");
+// Import du module "puppeter" afin d'automatiser des actions dans un navigateur. Dans notre cas, la génération de PDF
 const puppeteer = require("puppeteer");
+// Import du module "jsPDF" afin de créer des fichiers PDF
 const { jsPDF } = require("jspdf");
+// Chargement du fichier d'environnement
+require("dotenv").config();
 
+// Crée un serveur web avec "express"
 const app = express();
-const port = 3001;
+// Je récupère dans le .env le port sur lequel va écouter le serveur
+const port = process.env.PORT;
+
 
 app.use(express.json());
 
 // Utiliser le middleware CORS
 app.use(
     cors({
-        origin: "http://localhost:3000", // Autorise les requêtes depuis cette origine
+        origin: process.env.CORS_ORIGIN, // Autorise les requêtes depuis cette origine
         methods: ["GET", "POST"], // Autorise les méthodes GET et POST
         allowedHeaders: ["Content-Type", "Authorization"], // Autorise les en-têtes spécifiques
     })

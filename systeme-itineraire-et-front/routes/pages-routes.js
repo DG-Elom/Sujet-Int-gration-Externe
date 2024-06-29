@@ -4,7 +4,7 @@ const {
     getItineraries,
     setItineraries,
     getStations
-} = require("../utils/utils-functions");
+} = require("../utils/utils-functions"); // Importation des fonctions écrites dans un autre fichier
 const uuidv4 = require("uuid").v4;
 
 const getMainFunc = async (req, res) => {
