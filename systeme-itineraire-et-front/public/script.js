@@ -170,12 +170,12 @@ document.addEventListener("DOMContentLoaded", function () {
             },
         ];
         const itinerary_name = document.getElementById("itineraryName");
-        let itineraryName = "";
-        if (itinerary_name.value !== "") {
-            itineraryName = itinerary_name.value;
-        } else {
-            itineraryName = "Mon itinéraire";
-        }
+
+        const itineraryName = itinerary_name.value
+            ? itinerary_name.value.charAt(0).toUpperCase() +
+              itinerary_name.value.slice(1)
+            : "Mon itinéraire";
+
         const data = {
             name: itineraryName,
             points: waypoints,
