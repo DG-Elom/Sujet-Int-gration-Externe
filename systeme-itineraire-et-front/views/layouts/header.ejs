@@ -17,6 +17,7 @@
             rel="stylesheet"
             href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css"
         />
+        <link rel="stylesheet" href="style.css" />
     </head>
     <body>
         <nav class="navbar navbar-expand navbar-dark bg-dark">
@@ -79,10 +80,15 @@
                                         ></li>
                                 </ul>
                             </li>
+
                         <% } %>
                     </ul>
                 </div>
             </div>
         </nav>
+        <div id="loading-spinner">
+            <div class="spinner hidden"></div>
+            <p>Chargement en cours...</p>
+        </div>
     </body>
 </html>

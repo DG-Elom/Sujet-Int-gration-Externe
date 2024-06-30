@@ -197,6 +197,11 @@ app.post("/itinerary", async (req, res) => {
         const pdf = new jsPDF(); // Création d'un nouveau document PDF
         pdf.addImage(mapImage, "PNG", 0, 0); // Ajoute l'image de la carte au PDF
 
+        // créer le dossier pdfs s'il n'existe pas
+        if (!fs.existsSync("pdfs")) {
+            fs.mkdirSync("pdfs");
+        }
+
         // Enregistrement du PDF dans un fichier
         const pdfFilePath = path.join(
             __dirname,

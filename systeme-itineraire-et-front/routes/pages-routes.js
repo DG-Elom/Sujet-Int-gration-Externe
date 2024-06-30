@@ -3,8 +3,10 @@ const {
     verifyToken,
     getItineraries,
     setItineraries,
-    getStations
-} = require("../utils/utils-functions"); // Importation des fonctions écrites dans un autre fichier
+    getStations,
+    shortenAddress,
+    haversineDistance,
+} = require("../utils/utils-functions");
 const uuidv4 = require("uuid").v4;
 
 // Fonction pour gérer la page principale
@@ -36,20 +38,33 @@ const getMainFunc = async (req, res) => {
                     itineraries: [],
                 });
             }
+
             const itinerariesWithNames = await Promise.all(
+
                 itineraries.map(async (itinerary) => { // On boucle pour récupéreer les données de chaques itinéraires récupérés
-                    const startName = await getLieuName(
-                        itinerary.points[0].lat,
-                        itinerary.points[0].lng
-                    ); // On récupère le nom du lieu de départ
-                    const endName = await getLieuName(
-                        itinerary.points[1].lat,
-                        itinerary.points[1].lng
-                    ); // On récupère le nom du lieu d'arrivée
+                    const p_liste = await Promise.all(
+                        itinerary.points.map(async (point) => {
+                            const name = await getLieuName(
+                                point.lat,
+                                point.lng
+                            );
+                            return shortenAddress(name);
+                        })
+                    );
+
+                    const distance = haversineDistance(
+                        itinerary.points[0],
+                        itinerary.points[1]
+                    );
+
+                    const startName = p_liste[0]; // On récupère le nom du lieu de départ
+                    const endName = p_liste[1]; // On récupère le nom du lieu d'arrivée
+
                     return {
                         ...itinerary,
                         startName,
                         endName,
+                        distance,
                         token: req.cookies.usertoken,
                     };
                 })

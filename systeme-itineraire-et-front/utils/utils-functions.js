@@ -74,18 +74,29 @@ const setItineraries = async (req, itinerary) => {
     }
 };
 
+const shortenAddress = (address) => {
+    const parts = address.split(",");
+    const shortAddress = parts.slice(0, 3).join(", "); // Rue, quartier, arrondissement
+    return shortAddress;
+};
+
 // Fonction pour obtenir les itinéraires d'un utilisateur
 const getItineraries = async (req, userId) => {
     try {
-        const [itineraries_exist] = await req.db.execute(
+        const [rows] = await req.db.execute(
             "SELECT * FROM `itineraries` WHERE userId = ?",
             [userId]
         ); // On obtient les itinéraires de l'utilisateur de la base de données
 
-        if (itineraries_exist.length === 0) {
+        if (rows.length === 0) {
             return []; // On retourne un tableau vide si aucun itinéraire n'est trouvé
         }
-        return itineraries_exist; // On retourne les itinéraires trouvés
+        const itineraries = rows.map((row) => ({
+            ...row,
+            points: JSON.parse(row.points),
+        }));
+
+        return itineraries; // On retourne les itinéraires trouvés
     } catch (error) {
         console.error("Erreur lors de la récupération des itinéraires:", error);
         return {
@@ -122,6 +133,27 @@ const getStations = async () => {
     }
 };
 
+
+const haversineDistance = (coords1, coords2) => {
+    const R = 6371; // Rayon de la Terre en kilomètres
+    const dLat = toRad(coords2.lat - coords1.lat);
+    const dLon = toRad(coords2.lng - coords1.lng);
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(toRad(coords1.lat)) *
+            Math.cos(toRad(coords2.lat)) *
+            Math.sin(dLon / 2) *
+            Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c;
+    return distance.toFixed(2);
+};
+
+// Fonction auxiliaire pour convertir les degrés en radians
+const toRad = (degrees) => {
+    return degrees * (Math.PI / 180);
+};
+
 // On export ces fonctions pour pouvoir les récupérer dans d'autres fichiers
 module.exports = {
     getLieuName,
@@ -129,4 +161,6 @@ module.exports = {
     setItineraries,
     getStations,
     getItineraries,
+    shortenAddress,
+    haversineDistance,
 };
