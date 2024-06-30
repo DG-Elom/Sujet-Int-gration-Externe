@@ -210,6 +210,7 @@ document.addEventListener("DOMContentLoaded", function () {
             // désactivez le bouton si le nombre de marqueurs sélectionnés n'est pas égal à 2
 
             const itineraryId = this.id.split("_")[1];
+            const itineraryName = this.id.split("_")[2];
 
             button.disabled = true;
             document
@@ -234,7 +235,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement("a");
                     a.href = url;
-                    a.download = `itinerary-${itineraryId}.pdf`;
+                    a.download = `${itineraryName}.pdf`;
                     a.click();
                     alert("PDF généré avec succès");
                 })
