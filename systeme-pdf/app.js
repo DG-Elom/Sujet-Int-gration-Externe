@@ -210,20 +210,30 @@ app.post("/itinerary", async (req, res) => {
         if (!fs.existsSync("pdfs.json")) {
             fs.writeFileSync("pdfs.json", "[]");
         }
-        const pdfs_data = fs.readFileSync("pdfs.json"); // On lit le fichier JSON
-        const pdfs = JSON.parse(pdfs_data); // Conversion des données en objet pour pouvoir le manipuler
-        // vérifier si l'id de l'itinéraire existe déjà, si oui, le remplacer
-        const pdfIndex = pdfs.findIndex((pdf) => pdf.id === itinerary);
-        if (pdfIndex !== -1) {
-            // Supprimer l'ancien fichier PDF et le remplacer par le nouveau
-            fs.unlinkSync(pdfs[pdfIndex].pdfFilePath);
-            pdfs[pdfIndex] = { pdfFilePath: pdfFilePath, id: itinerary };
-        } else {
-            // Ajoute le nouveau fichier PDF
-            pdfs.push({ pdfFilePath: pdfFilePath, id: itinerary });
+        try {
+            const pdfsData = fs.readFileSync("pdfs.json").toString(); // Conversion en string
+            let pdfs = [];
+            if (pdfsData) {
+                pdfs = JSON.parse(pdfsData); // Conversion des données en objet pour pouvoir le manipuler
+            }
+            const pdfs_data = fs.readFileSync("pdfs.json").toString(); // On lit le fichier JSON
+
+            // vérifier si l'id de l'itinéraire existe déjà, si oui, le remplacer
+            const pdfIndex = pdfs.findIndex((pdf) => pdf.id === itinerary);
+            if (pdfIndex !== -1) {
+                // Supprimer l'ancien fichier PDF et le remplacer par le nouveau
+                fs.unlinkSync(pdfs[pdfIndex].pdfFilePath);
+                pdfs[pdfIndex] = { pdfFilePath: pdfFilePath, id: itinerary };
+            } else {
+                // Ajoute le nouveau fichier PDF
+                pdfs.push({ pdfFilePath: pdfFilePath, id: itinerary });
+            }
+            // On écrit les données dans le fichier json
+            fs.writeFileSync("pdfs.json", JSON.stringify(pdfs));
+        } catch (error) {
+            console.error("Error handling pdfs.json:", error);
+            // Consider creating a new file or handling the error as appropriate
         }
-        // On écrit les données dans le fichier json
-        fs.writeFileSync("pdfs.json", JSON.stringify(pdfs));
 
         // On enregistre le PDF dans le fichier
         pdf.save(pdfFilePath);
