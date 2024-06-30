@@ -229,6 +229,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         console.error("Erreur lors de la génération du PDF");
                         return;
                     }
+                    console.log("clic sur le bouton pdf");
 
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement("a");
@@ -236,10 +237,18 @@ document.addEventListener("DOMContentLoaded", function () {
                     a.download = `itinerary-${itineraryId}.pdf`;
                     a.click();
                     alert("PDF généré avec succès");
-                    button.disabled = false;
+                })
+                .catch((error) => {
+                    console.error(
+                        "Erreur lors de la récupération du PDF:",
+                        error.message
+                    );
+                })
+                .finally(() => {
                     document
                         .getElementById("loading-spinner")
                         .classList.add("hidden");
+                    button.disabled = false;
                 });
         });
     });
@@ -287,3 +296,10 @@ document.addEventListener("DOMContentLoaded", () => {
 window.addEventListener("load", () => {
     document.getElementById("loading-spinner").classList.add("hidden");
 });
+
+toastr.options = {
+    closeButton: true,
+    progressBar: true,
+    positionClass: "toast-top-right",
+    timeOut: 3000, // Durée d'affichage en millisecondes
+};

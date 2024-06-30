@@ -39,3 +39,11 @@
 #loading-spinner.hidden {
     display: none; /* Masquer le spinner */
 }
+
+footer {
+    position: sticky;
+    top: 500px;
+    bottom: 0;
+    width: 100%;
+    /* Autres styles pour le footer */
+}

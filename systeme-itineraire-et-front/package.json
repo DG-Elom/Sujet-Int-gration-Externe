@@ -23,6 +23,7 @@
     "mysql2": "^3.10.1",
     "osrm-text-instructions": "^0.15.0",
     "pm2": "^5.4.1",
+    "toastr": "^2.1.4",
     "uuid": "^10.0.0"
   }
 }

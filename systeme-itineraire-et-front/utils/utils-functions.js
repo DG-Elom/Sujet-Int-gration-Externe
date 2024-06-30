@@ -29,8 +29,25 @@ const verifyToken = async (token) => {
             },
             body: JSON.stringify({ jeton: token }), // On envoie le token dans le corps de la requête
         });
-        const data = await response.json(); // On convertit la réponse en JSON
-        return { valid: true, data }; // Retourne un objet indiquant que le token est valide
+        if (response.ok) {
+            // Vérifie si le code d'état est entre 200 et 299
+            const data = await response.json();
+            return { valid: true, data: data };
+        } else {
+            // Gérer les erreurs en fonction du code d'état
+            if (response.status === 401) {
+                return { valid: false, data: { message: "Token invalide" } };
+            } else {
+                return {
+                    valid: false,
+                    data: {
+                        message: "Erreur lors de la vérification du token",
+                    },
+                };
+            }
+        }
+
+        return { valid: true, data: data }; // Retourne un objet indiquant que le token est valide
     } catch (e) {
         return { valid: false, data: null }; // Retourne un objet indiquant que le token n'est pas valide
     }
@@ -132,7 +149,6 @@ const getStations = async () => {
         return { error: error.message }; // Renvoyer un objet d'erreur
     }
 };
-
 
 const haversineDistance = (coords1, coords2) => {
     const R = 6371; // Rayon de la Terre en kilomètres

@@ -18,7 +18,6 @@ const app = express();
 // Je récupère dans le .env le port sur lequel va écouter le serveur
 const port = process.env.PORT;
 
-
 app.use(express.json());
 
 // Utiliser le middleware CORS
@@ -70,8 +69,6 @@ app.post("/itinerary", async (req, res) => {
                 .status(401)
                 .json({ error: "Jeton d'authentification incorrect" });
         }
-        console.log(points);
-        console.log(itinerary);
 
         // Je récupère le nom du lieu de départ
         const depart = await getLieuName(points[0].lat, points[0].lng);

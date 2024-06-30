@@ -2,22 +2,31 @@
 const { verifyToken } = require("../utils/utils-functions");
 
 // Fonction pour gérer la page de connexion
-const getLoginFunc = (req, res) => {
-    // On initialise de l'objet de données avec un message null
-    let donnee = { message: null };
-    if (req.cookies.usertoken) { // On vérifie si le token utilisateur existe
-        // On vérifie si le token est valide
-        const { valid, data } = verifyToken(req.cookies.usertoken);
-        if (valid) {
-            // Si le token est valide on rend la page d'accueil
-            res.render("/", { user: data.utilisateur.identifiant });
-        } else {
-            // Si le token n'est pas valide on rend la page login
-            res.render("auth/login", { user: null, error: donnee.message });
+const getLoginFunc = async (req, res) => {
+    let donnee = {};
+    let errorMessage = null; // Variable pour stocker le message d'erreur
+
+    if (req.cookies.usertoken) {
+        try {
+            const { valid, data } = await verifyToken(req.cookies.usertoken);
+            donnee = { ...data };
+            if (valid) {
+                res.render("/", { user: data.utilisateur.identifiant });
+            } else {
+                errorMessage =
+                    donnee.message || "Erreur lors de la vérification du token"; // Message d'erreur par défaut
+            }
+        } catch (error) {
+            console.error("Erreur lors de la vérification du token :", error);
+            errorMessage = "Erreur lors de la vérification du token";
         }
     } else {
-        res.render("auth/login", { user: null, error: donnee.message });
+        // Pas de token, donc l'utilisateur n'est pas connecté
+
+        errorMessage = "Veuillez vous connecter";
     }
+
+    res.render("auth/login", { user: null, error: errorMessage });
 };
 
 // Fonction pour gérer la soumission du formulaire de connexion
@@ -35,10 +44,12 @@ const postLoginFunc = (req, res) => {
     })
         .then((response) => response.json()) // On convertit de la réponse en JSON
         .then((data) => {
-            if (data.statut == "Succès") { // Si le statut est "Succès"
+            if (data.statut == "Succès") {
+                // Si le statut est "Succès"
                 const { token } = data; // On extrait le token de la réponse
 
-                res.cookie("usertoken", token, {// On crée d'un cookie pour stocker le token de l'utilisateur
+                res.cookie("usertoken", token, {
+                    // On crée d'un cookie pour stocker le token de l'utilisateur
                     maxAge: 3600000, // Durée de vie du cookie
                     httpOnly: true, // Accessible uniquement par le serveur
                 });
@@ -100,7 +111,8 @@ const postRegisterFunc = (req, res) => {
                 // Redirection vers la page de login si le statut est succès
                 res.redirect("/login");
                 console.log(data.message);
-            } else { // Si le statut n'est pas "Succès"
+            } else {
+                // Si le statut n'est pas "Succès"
                 res.render("auth/register", {
                     user: null,
                     error: data.message,
@@ -109,10 +121,10 @@ const postRegisterFunc = (req, res) => {
         });
 };
 
-
 // Fonction pour afficher la page de mise à jour du profil
 const getUpdateProfileFunc = async (req, res) => {
-    if (req.cookies.usertoken) { // On vérifie si le cookie usertoken existe
+    if (req.cookies.usertoken) {
+        // On vérifie si le cookie usertoken existe
         // On vérifie si le token est valide
         const { valid, data } = await verifyToken(req.cookies.usertoken);
         if (valid) {
@@ -120,7 +132,7 @@ const getUpdateProfileFunc = async (req, res) => {
             res.render("updateUser", {
                 user: data.utilisateur.identifiant,
                 modification: "",
-                error: ""
+                error: "",
             });
         } else {
             res.redirect("/"); // Sinon on redirige sur la page d'accueil
@@ -130,26 +142,33 @@ const getUpdateProfileFunc = async (req, res) => {
 
 // Fonction pour gérer la soumission du formulaire de mise à jour du profil
 const postUpdateProfileFunc = async (req, res) => {
-    if (req.cookies.usertoken) { // On vérifie si le cookie usertoken existe
+    if (req.cookies.usertoken) {
+        // On vérifie si le cookie usertoken existe
         // On vérifie si le token est valide
         const { valid, data } = await verifyToken(req.cookies.usertoken);
-        if (valid) { // Si le token est valide 
+        if (valid) {
+            // Si le token est valide
             // On récupère les données dans le corps de la requête
             const { login, password } = req.body;
 
-            // On appel la route update sur le serveur d'authentification 
+            // On appel la route update sur le serveur d'authentification
             fetch(`${process.env.AUTH_SERVICE_URL}/update`, {
                 method: "PATCH", // On urilisa la méthode PATCH comme indiqué dans l'énoncé
                 headers: {
                     "Content-Type": "application/json",
                 },
                 // On envoie les données nécessaires dans le corps de la requête
-                body: JSON.stringify({ identifiant: login, motdepasse: password, id: data.utilisateur.userId, jeton: req.cookies.usertoken }),
+                body: JSON.stringify({
+                    identifiant: login,
+                    motdepasse: password,
+                    id: data.utilisateur.userId,
+                    jeton: req.cookies.usertoken,
+                }),
             })
                 .then((response) => response.json()) // On convertit la réponse en JSON
                 .then((dataRes) => {
-                    if (dataRes.statut == "Succès") { 
-                        // Si le statut est "Succès" on redirige la page vers la page d'accueil             
+                    if (dataRes.statut == "Succès") {
+                        // Si le statut est "Succès" on redirige la page vers la page d'accueil
                         res.redirect("/");
                     } else if (dataRes.statut == "ErreurIdentifiant") {
                         // Si le statut est "ErreurIdentifiant" qui correspond à un utilisateur déjà existant
@@ -166,10 +185,10 @@ const postUpdateProfileFunc = async (req, res) => {
                             modification: "",
                             error: "Une erreur est survenue, veuillez réessayer.",
                         });
-                        
                     }
                 });
-        } else { // Si le token n'est pas valide
+        } else {
+            // Si le token n'est pas valide
             res.redirect("/"); // Redirection vers la page d'accueil
         }
     }

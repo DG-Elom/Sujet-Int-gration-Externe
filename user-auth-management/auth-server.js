@@ -237,8 +237,6 @@ app.post("/login", validateRegisterAndLogin, async (req, res) => {
     // Je récupère le mot de passe en clair
     const password = req.body.motdepasse;
 
-    console.log(username + " : " + password + " se connecte");
-
     try {
         // Je récupère dans la base de données le password qui est lié à l'utilisateur renseigné
         const [username_exist] = await req.db.execute(
