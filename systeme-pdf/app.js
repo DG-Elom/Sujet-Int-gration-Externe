@@ -211,13 +211,11 @@ app.post("/itinerary", async (req, res) => {
             fs.writeFileSync("pdfs.json", "[]");
         }
         try {
-            const pdfsData = fs.readFileSync("pdfs.json").toString(); // Conversion en string
+            const pdfsData = fs.readFileSync("pdfs.json").toString(); // On lit le fichier JSON
             let pdfs = [];
             if (pdfsData) {
                 pdfs = JSON.parse(pdfsData); // Conversion des données en objet pour pouvoir le manipuler
             }
-            const pdfs_data = fs.readFileSync("pdfs.json").toString(); // On lit le fichier JSON
-
             // vérifier si l'id de l'itinéraire existe déjà, si oui, le remplacer
             const pdfIndex = pdfs.findIndex((pdf) => pdf.id === itinerary);
             if (pdfIndex !== -1) {

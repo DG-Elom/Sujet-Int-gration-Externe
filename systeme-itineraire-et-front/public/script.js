@@ -17,10 +17,12 @@ async function getLieuName(lat, lng) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    map.on("click", function (e) {
-        selectedPoints.push(e.latlng);
-        L.marker(e.latlng).addTo(map);
-    });
+    // Amélioration future: Ajouter un marqueur sur la carte lorsqu'un clic est effectué
+    // C'est pour permettre de créer un itinéraire à partir de deux points du map
+    // map.on("click", function (e) {
+    //     selectedPoints.push(e.latlng);
+    //     L.marker(e.latlng).addTo(map);
+    // });
 
     map.on("zoomend", function () {
         const itineraryInfo = document.getElementById("itinerary-info");
