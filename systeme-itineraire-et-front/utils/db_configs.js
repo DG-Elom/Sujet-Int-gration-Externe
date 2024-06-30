@@ -1,3 +1,4 @@
+// Import du module "mysql2" pour se connecter à une base de données
 const mysql = require("mysql2/promise");
 
 const db_configs = (req, res, next) => {

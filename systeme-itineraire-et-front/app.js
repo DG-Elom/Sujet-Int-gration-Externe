@@ -20,6 +20,8 @@ const {
     getRegisterFunc,
     postRegisterFunc,
     getLogoutFunc,
+    getUpdateProfileFunc,
+    postUpdateProfileFunc,
 } = require("./routes/auth-routes");
 const { get } = require("http");
 
@@ -33,7 +35,7 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(db_configs);
 
-// set template engine
+// Mise en place des template EJS
 app.set("view engine", "ejs");
 app.set("views", "./views");
 app.set("views", [
@@ -51,6 +53,8 @@ app.get("/logout", getLogoutFunc);
 app.post("/add-itinerary", postAddItineraryFunc);
 app.delete("/delete-itinerary", deleteItineraryFunc);
 app.get("/velibs", getVelibsFunc);
+app.get("/update", getUpdateProfileFunc);
+app.post("/update", postUpdateProfileFunc);
 
 app.listen(port, () => {
     console.log(`Server started on http://localhost:${port}`);
